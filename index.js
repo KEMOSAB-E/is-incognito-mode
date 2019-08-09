@@ -12,10 +12,19 @@ export default function isIncognito() {
     const unknown = () => reject(CANNOT_IDENTIFY_ERROR);
 
     if (browser === browsers.CHROME || browser === browsers.OPERA) {
-      const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
-      if (!fs) return unknown();
-
-      return fs(0, 0, no, yes);
+      //CHROME 
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        const {usage, quota} = navigator.storage.estimate().then({} =>{
+          console.log(`Using ${usage} out of ${quota} bytes.`);
+          if(quota < 120000000){
+             return yes();
+          } else {
+             return no();
+          }
+        }      	
+      } else {
+       return unknown();
+      }
     }
 
     if (browser === browsers.FIREFOX) {
